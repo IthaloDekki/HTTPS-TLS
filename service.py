@@ -17,9 +17,17 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0) as sock:
     print(f"Servidor escutando em {HOST}:{PORT}...")
 
     with context.wrap_socket(sock, server_side=True) as ssock: 
-        conn, addr = ssock.accept() # Conexão com cliente
-        with conn:
-            print(f"Conexão estabelecida com {addr}")
-            data = conn.recv(1024)  # Recebe dados do cliente (até 1024 bytes)
-            print(f"Recebido: {data.decode('utf-8')}")
-            conn.sendall(b"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nHello, Client!")
+        while True: 
+            conn, addr = ssock.accept() # Conexão com cliente
+            with conn:
+                print(f"Conexão estabelecida com {addr}")
+                data = conn.recv(1024)  # Recebe dados do cliente (até 1024 bytes)
+
+                if not data:
+                    break 
+
+                mensagem_recebida = data.decode('utf-8')
+                print(f"Recebido: {mensagem_recebida}")
+
+                resposta = f"Servidor recebeu: {mensagem_recebida}".encode('utf-8')
+                conn.sendall(resposta)
